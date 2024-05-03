@@ -1,0 +1,12 @@
+<launch>
+	<arg name="veh" doc="Name of vehicle. ex: megaman"/>
+	<arg name="robot_type" default="duckiebot" doc="Type of robot"/>
+    <arg name="pkg_name" value="led_driver"/>
+    <arg name="node_name" value="led_driver_node"/>
+
+	<group ns="$(arg veh)">
+	    <node pkg="$(arg pkg_name)" type="$(arg node_name).py"  name="$(arg node_name)" output="screen" required="true">
+		</node>
+	</group>
+
+</launch>

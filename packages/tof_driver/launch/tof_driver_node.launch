@@ -1,0 +1,14 @@
+<launch>
+    <arg name="veh" doc="Specify a vehicle name"/>
+    <arg name="name" doc="Specify a sensor name, ex: `front_center`"/>
+    <arg name="pkg_name" value="tof_driver"/>
+    <arg name="node_name" value="tof_driver_node"/>
+    <arg name="required" default="false"/>
+
+    <group ns="$(arg veh)">
+        <node pkg="$(arg pkg_name)" name="$(arg name)_tof_driver_node" type="$(arg node_name).py" output="screen" required="$(arg required)">
+            <param name="veh" value="$(arg veh)" />
+            <param name="sensor_name" value="$(arg name)" />
+        </node>
+    </group>
+</launch>

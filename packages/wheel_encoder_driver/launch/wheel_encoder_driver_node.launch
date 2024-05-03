@@ -1,0 +1,13 @@
+<launch>
+    <arg name="veh" doc="Name of vehicle. ex: megaman"/>
+    <arg name="wheel" doc="Unique name of the wheel (e.g., left)"/>
+    <arg name="pkg_name" default="wheel_encoder_driver"/>
+    <arg name="node_name" default="$(arg pkg_name)_node"/>
+
+    <group ns="$(arg veh)">
+        <node pkg="$(arg pkg_name)" type="$(arg node_name).py" name="$(arg wheel)_$(arg node_name)" output="screen" required="true">
+            <param name="veh" type="str" value="$(arg veh)"/>
+            <param name="wheel" type="str" value="$(arg wheel)"/>
+        </node>
+    </group>
+</launch>

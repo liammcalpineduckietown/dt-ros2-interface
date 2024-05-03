@@ -1,0 +1,12 @@
+<launch>
+    <arg name="veh" doc="Specify a vehicle name"/>
+    <arg name="pkg_name" value="button_driver"/>
+    <arg name="node_name" value="button_driver_node"/>
+    <arg name="required" default="false"/>
+
+    <group ns="$(arg veh)">
+        <node pkg="$(arg pkg_name)" name="$(arg node_name)" type="$(arg node_name).py" output="screen" required="$(arg required)">
+            <param name="veh" value="$(arg veh)" />
+        </node>
+    </group>
+</launch>

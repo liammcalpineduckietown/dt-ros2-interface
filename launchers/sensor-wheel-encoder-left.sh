@@ -9,9 +9,10 @@ source /environment.sh
 # NOTE: Use the variable DT_PROJECT_PATH to know the absolute path to your code
 # NOTE: Use `dt-exec COMMAND` to run the main process (blocking process)
 
+WHEEL=left
 
-# launch robot-type specific launcher
-exec dt-launcher-default-${ROBOT_TYPE}
+# TODO: update to ROS2 launch
+exec roslaunch --wait wheel_encoder_driver wheel_encoder_driver_node.launch veh:=$VEHICLE_NAME wheel:=$WHEEL
 
 
 # ----------------------------------------------------------------------------
