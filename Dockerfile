@@ -5,6 +5,8 @@ ARG PROJECT_MAINTAINER
 # pick an icon from: https://fontawesome.com/v4.7.0/icons/
 ARG PROJECT_ICON="cube"
 ARG PROJECT_FORMAT_VERSION
+# ROS2
+ARG ROS2_DISTRO=rolling
 
 # ==================================================>
 # ==> Do not change the code below this line
@@ -37,6 +39,12 @@ ARG TARGETPLATFORM
 ARG TARGETOS
 ARG TARGETARCH
 ARG TARGETVARIANT
+# - ROS2
+ARG ROS2_DISTRO
+
+# ROS2 info
+ENV ROS2_DISTRO="${ROS2_DISTRO}" \
+    COLCON_WS="/code"
 
 # check build arguments
 RUN dt-args-check \
@@ -65,6 +73,22 @@ ENV DT_PROJECT_NAME="${PROJECT_NAME}" \
     DT_PROJECT_PATH="${PROJECT_PATH}" \
     DT_PROJECT_LAUNCHERS_PATH="${PROJECT_LAUNCHERS_PATH}" \
     DT_LAUNCHER="${LAUNCHER}"
+
+# copy binaries
+#COPY ./assets/bin/. /usr/local/bin/
+
+# setup ROS2 sources
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg2 \
+    lsb-release \
+    && curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add - \
+    && sh -c 'echo "deb [arch=amd64,arm64] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2.list'
+
+# remove catkin from base image (installed by ament)
+# TODO: this might not be needed anymore
+RUN apt-get remove -y \
+    python3-catkin-pkg
 
 # install apt dependencies
 COPY ./dependencies-apt.txt "${PROJECT_PATH}/"
@@ -118,7 +142,5 @@ LABEL \
     org.duckietown.label.base.repository="${BASE_REPOSITORY}" \
     org.duckietown.label.base.tag="${BASE_TAG}"
 # <== Do not change the code above this line
-# <==================================================
+# <================================================== \
 
-# configure pretty-printing
-ENV PRETTYPRINT_EXTRAS_EXCLUDE="ipython_repr_pretty,ipython,django"
