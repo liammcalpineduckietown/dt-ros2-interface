@@ -82,8 +82,8 @@ class LEDDriverNode(DTROS):
             ),
             front_left=self._rgba(msg.rgb_vals[0]),
             front_right=self._rgba(msg.rgb_vals[4]),
-            rear_left=self._rgba(msg.rgb_vals[1]),
-            rear_right=self._rgba(msg.rgb_vals[3]),
+            back_left=self._rgba(msg.rgb_vals[1]),
+            back_right=self._rgba(msg.rgb_vals[3]),
         ).to_rawdata()
         # schedule the message for publishing
         asyncio.run_coroutine_threadsafe(self._pattern.publish(raw), self._loop)
