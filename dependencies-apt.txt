@@ -1,1 +1,14 @@
 # LIST YOUR APT PACKAGES HERE
+
+# colcon/ament packages
+# ament-cmake
+# ament-lint
+# ament-cmake-pytest
+# ament-cmake-googletest
+
+# ROS2 packages
+ros-rolling-ros-base
+ros-rolling-rclpy
+
+# TODO: cv-bridge is not very efficient, replace it with turbo-jpeg
+ros-rolling-cv-bridge
