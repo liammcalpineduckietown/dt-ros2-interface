@@ -64,7 +64,7 @@ class CameraNode(Node):
     async def worker(self):
         switchboard = (await context("switchboard")).navigate(self._robot_name)
         # TODO: the camera name should passed in as a CLI argument
-        camera: DTPSContext = switchboard / "sensor" / "camera" / "front-center"
+        camera: DTPSContext = switchboard / "sensor" / "camera" / "front_center"
         jpeg: DTPSContext = await (camera / "jpeg").until_ready()
         info: DTPSContext = await (camera / "info").until_ready()
         parameters: DTPSContext = await (camera / "parameters").until_ready()
