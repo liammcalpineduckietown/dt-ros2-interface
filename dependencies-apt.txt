@@ -9,6 +9,9 @@
 # ROS2 packages
 ros-rolling-ros-base
 ros-rolling-rclpy
+ros-rolling-std-msgs
+ros-rolling-rosidl-default-generators
+ros-rolling-tf-transformations
 
 # TODO: cv-bridge is not very efficient, replace it with turbo-jpeg
 ros-rolling-cv-bridge
