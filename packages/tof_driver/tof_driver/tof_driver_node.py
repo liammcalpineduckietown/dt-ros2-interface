@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+
+import asyncio
+import rclpy
+from rclpy.node import Node as ROS2Node
+from sensor_msgs.msg import Range as ROSRange
+from std_msgs.msg import Header
+from dt_robot_utils import get_robot_name
+from dtps import context
+from dtps_http import RawData
+from duckietown_messages.sensors.range import Range
+from duckietown_messages.utils.exceptions import DataDecodingError
+
+MAX_RANGE = 99  # meters
+
+
+class ToFNode(ROS2Node):
+    def __init__(self):
+        super().__init__('tof_node')
+        self._robot_name = get_robot_name()
+        # arguments
+        self.declare_parameter("sensor_name", "front_center")
+        self._sensor_name = self.get_parameter("sensor_name").get_parameter_value().string_value
+        # create publisher
+        self._pub = self.create_publisher(
+            ROSRange,
+            "range",
+            1
+        )
+        self.get_logger().info(f"Initialized for {self._sensor_name} sensor.")
+
+    async def publish(self, data: RawData):
+        # decode data
+        try:
+            tof: Range = Range.from_rawdata(data)
+        except DataDecodingError as e:
+            self.get_logger().error(f"Failed to decode an incoming message: {e.message}")
+            return
+
+        # Log the incoming data
+        # self.get_logger().info(f"Received data: {tof.data}, frame: {tof.header.frame}")
+
+        # Ensure the data is of the correct type and within valid ranges
+        if tof.data is not None and isinstance(tof.data, (float, int)):
+            distance = float(tof.data)
+        else:
+            self.get_logger().warn(f"Invalid or None data received: {tof.data}")
+            distance = MAX_RANGE
+
+        if distance > MAX_RANGE:
+            self.get_logger().warn(f"Distance {distance} is out of valid range, setting to max range {MAX_RANGE}")
+            distance = MAX_RANGE
+
+        # create Range message
+        tof_msg = ROSRange()
+        tof_msg.header = Header()
+        tof_msg.header.stamp = self.get_clock().now().to_msg()
+        tof_msg.header.frame_id = tof.header.frame
+        tof_msg.max_range = float(MAX_RANGE)
+        tof_msg.range = float(distance)  # Ensure distance is float
+        tof_msg.variance = 0.0
+
+        self._pub.publish(tof_msg)
+        # self.get_logger().info(f"Published range message: {tof_msg}")
+
+    async def worker(self):
+        try:
+            switchboard = (await context("switchboard")).navigate(self._robot_name)
+            self.get_logger().info("Connected to switchboard context.")
+            tof = await (switchboard / "sensor" / "time_of_flight" / self._sensor_name / "range").until_ready()
+            self.get_logger().info(f"Subscribed to topic: sensor/time_of_flight/{self._sensor_name}/range")
+            await tof.subscribe(self.publish)
+        except Exception as e:
+            self.get_logger().error(f"Failed to navigate ToF context: {str(e)}")
+            return
+        await self.join()
+
+    async def join(self):
+        while rclpy.ok():
+            await asyncio.sleep(1)
+
+    def spin(self):
+        try:
+            asyncio.run(self.worker())
+        except RuntimeError:
+            if rclpy.ok():
+                self.get_logger().error("An error occurred while running the event loop")
+                raise
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    tof_node = ToFNode()
+    tof_node.spin()
+    rclpy.shutdown()
+
+
+if __name__ == "__main__":
+    main()
