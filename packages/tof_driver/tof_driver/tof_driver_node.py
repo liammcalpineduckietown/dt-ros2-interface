@@ -12,6 +12,7 @@ from duckietown_messages.sensors.range import Range
 from duckietown_messages.utils.exceptions import DataDecodingError
 
 MAX_RANGE = 99  # meters
+OUT_OF_RANGE = 999
 
 
 class ToFNode(ROS2Node):
@@ -45,11 +46,11 @@ class ToFNode(ROS2Node):
             distance = float(tof.data)
         else:
             self.get_logger().warn(f"Invalid or None data received: {tof.data}")
-            distance = MAX_RANGE
+            distance = OUT_OF_RANGE
 
         if distance > MAX_RANGE:
-            self.get_logger().warn(f"Distance {distance} is out of valid range, setting to max range {MAX_RANGE}")
-            distance = MAX_RANGE
+            self.get_logger().warn(f"Distance {distance} is out of valid range, setting to max range {OUT_OF_RANGE}")
+            distance = OUT_OF_RANGE
 
         # create Range message
         tof_msg = ROSRange()
