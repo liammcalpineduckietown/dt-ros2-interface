@@ -7,13 +7,13 @@ Flask-Cors==4.0.0
 
 # this is for DTROS and buff_size input
 humanfriendly==10.0
-transforms3d
-django
-ipython
+transforms3d==0.4.2
+Django==5.1.1
+ipython==8.27.0
 
 # colcon build system
-colcon-common-extensions<=0.3.0
+colcon-common-extensions==0.3.0
 
 # these are required by colcon
-osrf-pycommon<=2.0.2
+osrf-pycommon==2.0.2
 # lark<=1.1.8
