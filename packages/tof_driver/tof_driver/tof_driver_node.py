@@ -31,6 +31,7 @@ class ToFNode(ROS2Node):
         self.get_logger().info(f"Initialized for {self._sensor_name} sensor.")
 
     async def publish(self, data: RawData):
+        # print(data)
         # decode data
         try:
             tof: Range = Range.from_rawdata(data)
@@ -60,7 +61,7 @@ class ToFNode(ROS2Node):
         tof_msg.max_range = float(MAX_RANGE)
         tof_msg.range = float(distance)  # Ensure distance is float
         tof_msg.variance = 0.0
-
+        # print(tof_msg)
         self._pub.publish(tof_msg)
         # self.get_logger().info(f"Published range message: {tof_msg}")
 
@@ -69,7 +70,7 @@ class ToFNode(ROS2Node):
             switchboard = (await context("switchboard")).navigate(self._robot_name)
             self.get_logger().info("Connected to switchboard context.")
             tof = await (switchboard / "sensor" / "time_of_flight" / self._sensor_name / "range").until_ready()
-            self.get_logger().info(f"Subscribed to topic: sensor/time_of_flight/{self._sensor_name}/range")
+            self.get_logger().info(f"Publishing to topic: sensor/time_of_flight/{self._sensor_name}/range")
             await tof.subscribe(self.publish)
         except Exception as e:
             self.get_logger().error(f"Failed to navigate ToF context: {str(e)}")
